@@ -1,43 +1,36 @@
-function [x] = OMP (K,y,A)
-    % return x which is the k-sparse representation of the signal y
-    %% Initializations
-    [m,n] = size (A) ;
-    Q = zeros (m,K) ;
-    R = zeros (K,K) ;
-    Rinv = zeros (K,K) ;
-    w = zeros (m,K) ;
-    x = zeros (1,n) ;
+function  x = OMP(A, y)
     
-    Res = y.' ; % Initialize residue to y
-    for J = 1 : K    
-        %Find the index of maximum projection component on residue
-        [V ,kkk] = max(abs(A'*Res)) ;
-        kk (J) = kkk ;
+    xini = zeros(size(A,2),1);
+    basis = [];
+    residue = y;
+    prev_residue = y + 2*(ones(size(y)));
+    xans = [];
+    count = 0;
+    
+    % Change the termination condition set eta
+    eta = 0.000001;
+    while ((count<200) && (sum(abs(prev_residue - residue) >= eta*ones(size(y))) > 0))
+        disp("Iteration " + count); 
+        % Finding out the projections on residue
+        proj = abs(A' * residue);
+        [~, index] = max(proj);
         
-        %Update Residue using newly obtained basis
-        w (:,J) = A (:,kk (J)) ;
-        for I = 1 : J-1
-            if (J-1 ~= 0)
-                R (I,J) = Q (:,I)' * w (:,J) ;
-                w (:,J) = w (:,J) - R (I,J) * Q (:,I) ;
-            end
-        end
-        R (J,J) = norm (w (:,J)) ;
-        Q (:,J) = w (:,J) / R (J,J) ;
-        Res = Res - (Q (:,J) * Q (:,J)' * Res) ;
+        % Updating the basis
+        basis = [basis index];
+
+        % Finding out new x
+        inv = A(:, basis);
+        inv = (inv' * inv)\(inv'*y);
+        xans = inv;
+        
+        % Updating the residue
+        prev_residue = residue;
+        residue = y - (A(:,basis) * xans);
+        count = count + 1;
     end
-    
-    %Find x which minimizes the Least Squares error
-    for J = 1 : K
-        Rinv (J,J) = 1 / R (J,J) ;
-        if (J-1 ~= 0)
-            for I = 1 : J-1
-                Rinv (I,J) = -Rinv (J,J) * (Rinv (I,1:J-1) * R (1:J-1,J)) ;
-            end
-        end
-    end
-    xx = Rinv * Q' * y.' ;
-    for I = 1 : K
-        x (kk (I)) = xx (I) ;
-    end
+
+    x = xini;
+    t = basis';
+    x(t) = xans;
+
 end
