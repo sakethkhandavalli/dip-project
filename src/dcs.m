@@ -2,7 +2,7 @@ function hrm = dcs(lrm,hrp)
 % lrm = imread('../data/Landsat/10_MS.png');
 % hrp = imread('../data/Landsat/10_PAN.png');
 	%Hyper Parameters
-	k = 40; % Patch size
+	k = 70; % Patch size
 	r = 0.6; % r percent overlap
 	m = 200; % no of observations in CS
     

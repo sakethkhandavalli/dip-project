@@ -1,4 +1,4 @@
-function filtered_hrp = low_pass(hrp)
+function filtered_hrp = low_pass(hrp,sd)
 	 
 	% compute FFT of the grey image
 	A = fft2(double(hrp));
@@ -8,7 +8,6 @@ function filtered_hrp = low_pass(hrp)
 	% It has three parameters : Two means mu_x,mu_y and the standard deviation sd
 
 	[M,N] = size(A);
-	sd = 90;
 	X = 0:N-1;
 	Y = 0:M-1;
 	[X,Y] = meshgrid(X,Y);
