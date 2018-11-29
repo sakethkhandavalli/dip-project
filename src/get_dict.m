@@ -6,9 +6,11 @@ function dict = get_dict(img,k,r)
 	for i = 1:k-floor(k*r):h-k
 		for j = 1:k-floor(k*r):w-k
 			patch = img(i:i+k-1,j:j+k-1);
-            dict(:,idx) = patch(:) - mean(patch(:));
+            dict(:,idx) = patch(:);
 			idx = idx + 1;
 		end
     end
+
+    dict = dict - mean(dict(:));
     
 end
